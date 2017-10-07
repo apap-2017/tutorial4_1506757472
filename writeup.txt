@@ -1,0 +1,39 @@
+Hal yang dipelajari:
+  Pada Tutorial ini saya mempelajari jangan pernah skip tutorial APAP karena sekali ketinggalan maka perlu usaha lebih untuk mengerjakan tutorial selanjutnya, apabila submisi ini tidak dinilai saya pasrah tapi tetap saya kerjakan karena diperlukan untuk tutorial 5.
+
+  Selain mempelajari hal tersebut, saya mempelajari bahwa framework Java Spring dapat dikoneksikan ke sebuah database, dengan menggunakan myBatis sebagai mediator spring dengan database MySql, Java Spring juga mendukung penggunaan metode DAO atau Data Access Object untuk abstraksi pemanggilan fungsi database (seperti fungsi SQL) sehingga method method lain yang ingin merubah data di database tidak harus mengimplementasi fungsi-fungsi database yang diperlukan sendiri, tetapi tinggal menggunakan fungsi yang ada di DAO dan dapat digunakan berkali kali oleh banyak kelas atau metode sekaligus.
+
+  Saya juga mempelajari bahwa spring juga memiliki library logger bernama Slf4j dari Lombok untuk keperluan logging, dan betapa mudahnya menggunakan library tersebut. Saya juga mempelajari basic-basic HTTP Request method yang dapat diutilisasi oleh Spring, seperti sebuah controller hanya valid untuk metode GET atau POST, hal ini berguna untuk membedakan response di suatu URL jika diakses oleh HTTP Request Method yang berbeda beda.
+
+Penjelasan Method yang dibuat:
+  1. Method Delete
+      [Kode Sumber dapat dilihat langsung di folder tutorial4]
+
+      Metode delete yang saya buat bermula dari pembuatan method baru di DAO studentMapper, dimana saya membuat method deleteStudent() dengan parameter npm bertipe string, method itu berupa method void karena tidak perlu mengembalikan data apapun, dan karena method tersebut merupakan method mapper dari DAO, maka tidak ada isinya, melainkan isinya diprovide oleh dekorator @Delete yang saya import dari myBatis, dekorator @Delete ini akan mengisikan method deleteStudent() saya dengan hal hal yang diperlukan, dalam parameter pemanggilan dekorator ini, saya harus memasukan kode SQL yang akan dijalankan ketika method deleteStudent dipanggil, SQL yang saya masukkan cukup sederhana, dimana dia akan melakukan fungsi DELETE pada tabel (FROM) student dimana (WHERE) npm student tersebut sama dengan npm yang ada di parameter fungsi deleteStudent() (npm = #{npm})
+
+      Selain menambahkan fungsi di DAO, saya menambahkan fungsi di service, dimana pada StudentServiceDatabase, saya mengimport DAO studentMapper dan membuat method deleteStudent yang memerlukan parameter npm bertipe String dan berguna untuk memanggil fungsi deleteStudent pada studentMapper, fungsi ini hanya digunakan untuk meneruskan service ke DAO serta menambahkan logging setiap kali fungsi dipanggil. Setelah menambahkan method tersebut pada service, saya menambahkan fungsi delete pada controller, dimana dia akan membalas segala request yang berasal dari url /student/delete/{npm} dan akan mengambil path variable npm yang bertipe string, lalu akan melakukan pemanggilan fungsi selectStudent dari StudentService dengan npm yang ada, jika selectStudent mengembalikan suatu student (tidak null), maka fungsi ini akan mendelete student tersebut (memanggil fungsi deleteStudent) dan mengembalikan halaman delete untuk dirender, jika student null atau tidak ada, maka fungsi akan mengembalikan halaman not-found yang artinya student tidak ditemukan. Pada viewall.html saya juga menambahkan hyperlink delete ke setiap mahasiswa yang jika di klik akan menghapus mahasiswa tersebut.
+
+  2. Method Update
+      [Kode Sumber dapat dilihat langsung di folder tutorial4]
+
+      Method update disini sebenarnya merupakan kloning dari method tambah, bedanya adalah method ini merubah data yang sudah ada, dari sisi view html yang dirender, semuanya sama akan tetapi semua field sudah terisi secara default dan field npm bersifat read only dan tidak bisa dirubah. ketika semua form sudah diisi dan user memencet tombol submit maka user akan diarahkan untuk melakukan posting ke /student/update/submit
+
+      Dari sisi controllernya, setiap dipanggil maka akan melakukan pengecekan apakah pengguna yang akan dirubah sudah ada, jika sudah render view form-update, jika tidak ada render view not-found
+
+  3. Method Update Submit
+      [Kode Sumber dapat dilihat langsung di folder tutorial4]
+
+      Pada update submit, awalnya saya menerima data berupa parameter di url, akan tetapi sesuai permintaan saya meminta data berupa object Student yang harus divalidasi dengan dekorator @Valid dan menyesuaikan attribut dari model StudentModel, object ini didapatkan dengan menggunakan dekorator @ModelAttribute, serta method ini juga menangkap segala result yang ada dengan tipe data BindingResult dan fungsi submit ini hanya akan menangkap segala request ke /student/update/submit yang menggunakan HTTP POST method. Setelah menerima object Student yang disubmit, maka method akan melakukan pengecekan apakah ada error dari result dengan memanggil fungsi hasError(), jika error maka akan mengembalikan view form-update, jika tidak maka akan melakukan pemanggilan fungsi updateStudent dari StudentService.
+
+      pada StudentService, saya membuat fungsi updateStudent, yang berguna untuk melakukan logging dan meneruskan pemanggilan fungsi ke DAO, pada DAO saya membuat method updateStudent yang menerima object StudentModel student dan melakukan pemanggilan SQL yang bertugas untuk mengupdate data di database, dengan cara memanggil fungsi UPDATE tabel student dengan mengganti (SET) data npm, nama, dan gpa sesuai dengan data yang ada di parameter jika dan hanya jika npm student yang sedang dicek merupakan npm yang sesuai dengan data yang ada di parameter.
+
+Jawaban Pertanyaan:
+  1. Perlu, karena sebaik apapun validasi yang kita buat di frontend, dapat di rubah oleh client, sehingga perlu juga melakukan validasi di backend dimana kita bisa memastikan aplikasi kita konsisten dan hanya kita yang dapat mengontrol aplikasi kita. Selain menambahkan kekuatan validasi data, hal ini juga penting untuk keamanan aplikasi.
+
+  2. Karena menurut spesifikasi dari HTTP sendiri, method GET tidak dapat mengirimkan data pada Request Body, sedangkan method selain GET (Seperti POST) dapat menambahkan data pada setiap request yang dimasukan pada Request Body.
+
+  3. Bisa, tergantung bagaimana kita mendefinisikannya. Satu Method secara default akan menerima segala bentuk request, akan tetapi kita bisa mengaturnya agar dia hanya dapat menerima beberapa tipe request yang kita tentukan.
+
+Kenny Reida Dharmawan,
+APAP - C,
+1506757472.
